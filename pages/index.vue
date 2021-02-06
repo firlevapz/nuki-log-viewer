@@ -1,6 +1,5 @@
 <template>
-  <p v-if="$fetchState.pending">Fetching data...</p>
-  <p v-else-if="$fetchState.error">An error occurred :(</p>
+  <p v-if="$fetchState.error">An error occurred :(</p>
   <div v-else>
     <section>
       <b-table
@@ -14,6 +13,7 @@
         :pagination-rounded="isPaginationRounded"
         :sort-icon="sortIcon"
         :sort-icon-size="sortIconSize"
+        :loading="$fetchState.pending"
         default-sort="date"
         aria-next-label="Next page"
         aria-previous-label="Previous page"
@@ -55,15 +55,6 @@
         <b-table-column field="name" label="Name" sortable v-slot="props">
           {{ props.row.name }}
         </b-table-column>
-
-        <!-- <b-table-column label="Gender" v-slot="props">
-                <span>
-                    <b-icon pack="fas"
-                        :icon="props.row.gender === 'Male' ? 'mars' : 'venus'">
-                    </b-icon>
-                    {{ props.row.gender }}
-                </span>
-            </b-table-column> -->
       </b-table>
     </section>
 
@@ -75,12 +66,9 @@
         <option value="20">20 per page</option>
       </b-select>
       <div class="control is-flex">
-        <b-switch v-model="isPaginationSimple" :disabled="!isPaginated"
-          >Simple pagination</b-switch
+        <b-switch v-model="isDoorStateShown" @input="filterDoorStates"
+          >Tür Status anzeigen</b-switch
         >
-      </div>
-      <div class="control">
-        <b-button label="Refresh" @click="$fetch" />
       </div>
     </b-field>
   </div>
@@ -88,6 +76,15 @@
 
 <script>
 export default {
+  methods: {
+    filterDoorStates() {
+      if (!this.isDoorStateShown) {
+        this.data = this.data.filter((elem) => [2, 3].includes(elem.action))
+      } else {
+        this.$fetch()
+      }
+    },
+  },
   data() {
     return {
       data: [],
@@ -100,6 +97,12 @@ export default {
       sortIconSize: 'is-small',
       currentPage: 1,
       perPage: 10,
+      isDoorStateShown: false,
+    }
+  },
+  activated() {
+    if (!this.isDoorStateShown) {
+      this.data = this.data.filter((elem) => [2, 3].includes(elem.action))
     }
   },
   async fetch() {
