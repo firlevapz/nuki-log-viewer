@@ -22,18 +22,28 @@
       >
         <b-table-column
           field="date"
-          label="Date"
+          label="Datum"
           sortable
           centered
           v-slot="props"
         >
-          <span>
-            {{ new Date(props.row.date).toLocaleDateString('lt') }}
-            {{ new Date(props.row.date).toLocaleTimeString('de-AT') }}
-          </span>
+          <b-tooltip position="is-left" :label="datetime(props.row.date)">
+            <time-ago
+              :refresh="60"
+              :datetime="new Date(props.row.date)"
+              locale="de"
+              long
+            ></time-ago>
+          </b-tooltip>
         </b-table-column>
 
-        <b-table-column field="action" label="Action" sortable v-slot="props">
+        <b-table-column
+          field="action"
+          label="Action"
+          sortable
+          centered
+          v-slot="props"
+        >
           <b-tooltip v-if="props.row.action == '2'" label="Zugesperrt">
             <b-icon class="has-text-success" icon="lock"> </b-icon>
           </b-tooltip>
@@ -61,10 +71,10 @@
 
     <b-field grouped group-multiline>
       <b-select v-model="perPage" :disabled="!isPaginated">
-        <option value="5">5 per page</option>
-        <option value="10">10 per page</option>
-        <option value="15">15 per page</option>
-        <option value="20">20 per page</option>
+        <option value="5">5 pro Seite</option>
+        <option value="10">10 pro Seite</option>
+        <option value="15">15 pro Seite</option>
+        <option value="20">20 pro Seite</option>
       </b-select>
       <div class="control is-flex">
         <b-switch v-model="isDoorStateShown" @input="$fetch"
@@ -75,8 +85,26 @@
   </div>
 </template>
 
+<style>
+@import 'vue2-timeago/dist/vue2-timeago.css';
+</style>
+
 <script>
+import { TimeAgo } from 'vue2-timeago'
+
 export default {
+  components: {
+    TimeAgo,
+  },
+  methods: {
+    datetime(datestr) {
+      return (
+        new Date(datestr).toLocaleDateString('lt') +
+        ' ' +
+        new Date(datestr).toLocaleTimeString('de-AT')
+      )
+    },
+  },
   data() {
     return {
       data: [],
@@ -94,13 +122,13 @@ export default {
     }
   },
   async fetch() {
-    const response = await fetch('https://api.nuki.io/smartlock/log?limit=40', {
-      headers: {
-        Authorization:
-          'Bearer e9bff49447c33a52746e84751773384b546fcd23d96c519fdf0beef8b1c4af1ec8c21bc185b21f4c',
-      },
-    })
-    // const response = await fetch('/abs-log-data')
+    // const response = await fetch('https://api.nuki.io/smartlock/log?limit=40', {
+    //   headers: {
+    //     Authorization:
+    //       'Bearer e9bff49447c33a52746e84751773384b546fcd23d96c519fdf0beef8b1c4af1ec8c21bc185b21f4c',
+    //   },
+    // })
+    const response = await fetch('/nuki-log-data')
     this.data = await response.json()
 
     if (!this.isDoorStateShown) {
