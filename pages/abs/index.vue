@@ -51,6 +51,9 @@
             <b-icon class="has-text-danger" icon="lock-open-variant-outline">
             </b-icon>
           </b-tooltip>
+          <b-tooltip v-else-if="props.row.action == '4'" label="Lock'n'Go">
+            <b-icon class="has-text-success" icon="lock"> </b-icon>
+          </b-tooltip>
           <b-tooltip v-else-if="props.row.action == '240'" label="Tür geöffnet">
             <b-icon icon="door-open"> </b-icon>
           </b-tooltip>
@@ -132,7 +135,7 @@ export default {
     this.data = await response.json()
 
     if (!this.isDoorStateShown) {
-      this.data = this.data.filter((elem) => [2, 3].includes(elem.action))
+      this.data = this.data.filter((elem) => [2, 3, 4].includes(elem.action))
     }
   },
   fetchOnServer: false,
