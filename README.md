@@ -1,4 +1,9 @@
-# app
+# Nuki Log Viewer
+
+## Overview
+
+This is a simple nuxt-app to view logs from the
+Nuki-api (https://api.nuki.io).
 
 ## Build Setup
 
